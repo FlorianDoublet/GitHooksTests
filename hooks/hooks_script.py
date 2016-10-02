@@ -66,16 +66,16 @@ def pre_push():
 	two_last_commit = execute_cmd( [ git_cmd, "log",  "--pretty=oneline",  "-n",  "2" ] )
 	#get the messages of the commits
 	first_commit_sha1_msg = two_last_commit.splitlines()[0].split(" ", 1)
-	second_commit_sha1_msg = two_last_commit.splitlines()[0].s.split(" ", 1)
+	second_commit_sha1_msg = two_last_commit.splitlines()[1].split(" ", 1)
 	
 	#default param if the last commit is the user refactor commit
 	commit_msg = None
 	head = 1
 	
 	#if the first commit isn't the refactor user commit
-	if user_refact_msg != first_commit_message[1] :
+	if user_refact_msg != first_commit_sha1_msg[1] :
 		head += 1
-		commit_msg = first_commit_message[0]
+		commit_msg = first_commit_sha1_msg[1]
 	
 	#then we reset the commit(s)
 	git_reset_head(head)
@@ -87,12 +87,14 @@ def post_push():
 	user_refactor()
 	
 
-def srv_refactor(argv, commmit_msg=None):
+def srv_refactor(argv, commit_msg=None):
 	
 	#TODO : le refactoring server
+	#Du coup je fait un mock pour le moment
+	os.system("python3 hooks/mock_refac_srv.py")
 	
 	#the rebased commit (if we have to)
-	if commmit_msg :
+	if commit_msg :
 		git_add_all()
 		git_simple_commit(commit_msg)
 	
@@ -103,6 +105,9 @@ def srv_refactor(argv, commmit_msg=None):
 	
 def user_refactor():
 	#TODO : le user refactoring
+	#Du coup je fait un mock pour le moment
+	os.system("python3 hooks/mock_refac_usr.py")
+	
 	
 	#adding all refactored files
 	git_add_all()

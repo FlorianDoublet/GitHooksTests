@@ -1,0 +1,7 @@
+filef = open("f", "r+")
+temp = filef.read()
+temp = temp.replace("_", "	")
+filef.seek(0)
+filef.truncate()
+filef.write(temp)
+filef.close()
