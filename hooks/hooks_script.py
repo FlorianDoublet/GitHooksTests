@@ -7,8 +7,9 @@ from subprocess import Popen, PIPE
 import time
 import pexpect
 
-hooked_commands = ["pull", "push", "commit"]
+hooked_commands = ["pull", "push"]
 git_cmd = "/usr/bin/git"
+user_refact_msg = "user refactor (will be deleted)"
 
 def main(argv):
 	
@@ -52,7 +53,7 @@ def pull_hook(argv):
 	print(stdout_value)
 	
 	#on commit
-	proc = subprocess.Popen([git_cmd, 'commit', '-m', '"user refactor (will be deleted)"'], stdout=subprocess.PIPE)
+	proc = subprocess.Popen([git_cmd, 'commit', '-m', user_refact_msg], stdout=subprocess.PIPE)
 	stdout_value = proc.communicate()[0].decode("utf-8")
 	print(stdout_value)
 	
@@ -62,9 +63,74 @@ def pull_hook(argv):
 def push_hook(argv):
 	print("push hook")
 	
+	#first, pre_push operations
+	commit_msg = pre_push()
 
-def commit_hook(argv):
-	print("commit hook")
+	#and we process to the server_refactoring (push included)
+	res = srv_refactor(argv, commit_msg)
+	
+	#then post_push operations
+	post_push()
+
+def pre_push():
+	#get the two last commit sha1 and message
+	two_last_commit = execute_cmd( [ git_cmd, "log",  "--pretty=oneline",  "-n",  "2" ] )
+	#get the messages of the commits
+	first_commit_sha1_msg = two_last_commit.splitlines()[0].split(" ", 1)
+	second_commit_sha1_msg = two_last_commit.splitlines()[0].s.split(" ", 1)
+	
+	#default param if the last commit is the user refactor commit
+	commit_msg = None
+	head = 1
+	
+	#if the first commit isn't the refactor user commit
+	if user_refact_msg != first_commit_message[1] :
+		head += 1
+		commit_msg = first_commit_message[0]
+	
+	#then we reset the commit(s)
+	git_reset_head(head)
+	return commit_msg
+
+
+def post_push():
+	#we simplu apply the user_refactor process
+	user_refactor()
+	
+
+def srv_refactor(argv, commmit_msg=None):
+	
+	#TODO : le refactoring server
+	
+	#the rebased commit (if we have to)
+	if commmit_msg :
+		git_add_all()
+		git_simple_commit(commit_msg)
+	
+	#we push it with the real push cmd given by the user
+	full_cmd = argv
+	full_cmd.insert(0, git_cmd)
+	return execute_cmd(full_cmd)
+	
+def user_refactor():
+	#TODO : le user refactoring
+	
+	#adding all refactored files
+	git_add_all()
+	
+	#then we commit it with our default message
+	git_simple_commit(user_refact_msg)
+
+	
+def git_simple_commit(message):
+	return execute_cmd([git_cmd, "commit", "-m", message ], print_it=False)
+
+def git_reset_head(head):
+	execute_cmd( [ git_cmd, "reset",  ("HEAD~" + str(head)) ], print_it=False)
+	
+def git_add_all():
+	execute_cmd( [ git_cmd, "add", "--all"  ], print_it=False)
+	
 	
 def array_to_string(argv):
 	arg_string = ""
@@ -84,20 +150,9 @@ def execute_cmd(arg_list, print_it=True):
 	stdout_value = proc.communicate()[0].decode("utf-8")
 	if print_it != False :
 		print(stdout_value)
+	if proc.returncode != 0 :
+		return proc.returncode
 	return stdout_value
-
-def check_if_pending_commit():
-	arg_list = [ git_cmd, "cherry", "-v" ]
-	res = execute_cmd(arg_list, print_it=False)
-	if res == "" :
-		return False
-	elif res.startswith("+ ") :
-		return True
-	#there is a problem, for example we don't have this branch pushed in local
-	else :
-		print(res)
-		return True
-	
 
 
 if __name__ == "__main__":
