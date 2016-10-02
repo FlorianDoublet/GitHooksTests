@@ -91,7 +91,7 @@ def srv_refactor(argv, commit_msg=None):
 	
 	#TODO : le refactoring server
 	#Du coup je fait un mock pour le moment
-	os.system("python3 hooks/mock_refac_srv.py")
+	os.system("python3 mock_refac_srv.py")
 	
 	#the rebased commit (if we have to)
 	if commit_msg :
@@ -106,7 +106,7 @@ def srv_refactor(argv, commit_msg=None):
 def user_refactor():
 	#TODO : le user refactoring
 	#Du coup je fait un mock pour le moment
-	os.system("python3 hooks/mock_refac_usr.py")
+	os.system("python3 mock_refac_usr.py")
 	
 	
 	#adding all refactored files
