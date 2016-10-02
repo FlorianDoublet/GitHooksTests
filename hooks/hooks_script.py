@@ -86,6 +86,11 @@ def execute_cmd(arg_list, print_it=True):
 		print(stdout_value)
 	return stdout_value
 
+"""
+check if some commits are not already pushed
+if this function is launch after a push and return True 
+then it mean that the push failed
+"""
 def check_if_pending_commit():
 	arg_list = [ git_cmd, "cherry", "-v" ]
 	res = execute_cmd(arg_list, print_it=False)
