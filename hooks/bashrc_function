@@ -18,7 +18,7 @@ function git ()
 			#check if the script exist or not
 			if [ -f $script_path ]; then
 			   #we can lauch the script with the git arguments
-			   python3 $script_path $@
+			   python3 $script_path "$@"
 			else
 			   echo "Error : the git custom hook file $script_path should exist. If this repository shouldn't contain custom git hooks anymore please fix it in ~.bashrc and then run source ~/.bashrc"
 			fi
