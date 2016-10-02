@@ -62,15 +62,6 @@ def pull_hook(argv):
 def push_hook(argv):
 	print("push hook")
 	
-	child = pexpect.spawn ("git push")
-	child.expect("Username for .*")
-	print("OFDSLKFJSDLKJF")
-	print(child.before.decode("utf-8"))
-	child.send("FlorianDoublet\n")
-	child.expect("Password")
-	print(child.before)
-	child.send("Tu le sauras pas")
-	print(" last " + child.after.decode("utf-8"))
 
 def commit_hook(argv):
 	print("commit hook")
@@ -80,8 +71,33 @@ def array_to_string(argv):
 	for arg in argv :
 		arg_string += arg + " "
 	return arg_string
+	
+"""
+will execute the cmd in the system.
+the main cmd and each argument have to be in an element of the list
+return the value of the command
+"""
+def execute_cmd(arg_list, print_it=True):
+	#create the proc
+	proc = subprocess.Popen(arg_list, stdout=subprocess.PIPE)
+	#communicate with the proc and get the stdout value
+	stdout_value = proc.communicate()[0].decode("utf-8")
+	if print_it != False :
+		print(stdout_value)
+	return stdout_value
 
-
+def check_if_pending_commit():
+	arg_list = [ git_cmd, "cherry", "-v" ]
+	res = execute_cmd(arg_list, print_it=False)
+	if res == "" :
+		return False
+	elif res.startswith("+ ") :
+		return True
+	#there is a problem, for example we don't have this branch pushed in local
+	else :
+		print(res)
+		return True
+	
 
 
 if __name__ == "__main__":
