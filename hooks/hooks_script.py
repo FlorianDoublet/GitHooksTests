@@ -38,7 +38,7 @@ def pull_hook(argv):
 	res = execute_cmd(full_cmd)
 
 	#if it's already up to date we don't have to do anything anymore
-	if "Already up-to-date" in res :
+	if "Already up-to-date 444" in res :
 		return
 	
 	#post_pull 
