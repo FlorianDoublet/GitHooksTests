@@ -19,7 +19,10 @@ def main(argv):
 		push_hook(argv)
 	else :
 		print("commande originale :")
-		os.system(git_cmd + " " + array_to_string(argv))
+		print(argv)
+		full_cmd = argv
+		full_cmd.insert(0, git_cmd)
+		execute_cmd(full_cmd)
 	
 	
 
@@ -31,33 +34,19 @@ def pull_hook(argv):
 	#built the array for the command and args
 	full_cmd = argv
 	full_cmd.insert(0, git_cmd)
-	#create the proc
-	proc = subprocess.Popen(full_cmd, stdout=subprocess.PIPE)
-	#communicate with the proc
-	stdout_value = proc.communicate()[0].decode("utf-8")
-	print(stdout_value)
+	#launch the real pull cmb given by the user
+	res = execute_cmd(full_cmd)
+
 	#if it's already up to date we don't have to do anything anymore
-	if "Already up-to-date" in stdout_value :
+	if "Already up-to-date" in res :
 		return
 	
 	#post_pull 
-	#Here we will refactor our class
-	os.system('echo "test" >> f')
-	
-	#TODO : get list of modified file
-	#git diff --name-only
-	
-	#on add les files
-	proc = subprocess.Popen([git_cmd, 'add', 'f'], stdout=subprocess.PIPE)
-	stdout_value = proc.communicate()[0].decode("utf-8")
-	print(stdout_value)
-	
-	#on commit
-	proc = subprocess.Popen([git_cmd, 'commit', '-m', user_refact_msg], stdout=subprocess.PIPE)
-	stdout_value = proc.communicate()[0].decode("utf-8")
-	print(stdout_value)
-	
+	res = post_pull()
 
+	
+def post_pull():
+	user_refactor()
 	
 	
 def push_hook(argv):
@@ -94,7 +83,7 @@ def pre_push():
 
 
 def post_push():
-	#we simplu apply the user_refactor process
+	#we simply apply the user_refactor process
 	user_refactor()
 	
 
